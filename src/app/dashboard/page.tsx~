@@ -1,0 +1,6 @@
+import {MyComponent} from './MyComponent'
+
+export default function Page() {
+	<MyComponent />
+}
+
