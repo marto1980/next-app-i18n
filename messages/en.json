@@ -1,0 +1,11 @@
+{
+    "HomePage": {
+        "title": "This is my main page component"
+    },
+    "ClientComponent": {
+        "title": "The fancy translated text of my client component"
+    },
+    "ServerComponent": {
+        "title": "The translated text of my server component"
+    }
+}

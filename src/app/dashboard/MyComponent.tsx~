@@ -1,4 +1,0 @@
-const Mycomponent = () => (<div> The translated text of my component </div>)
-
-export {MyComponent}
-
