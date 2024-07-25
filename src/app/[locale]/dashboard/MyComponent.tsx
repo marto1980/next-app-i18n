@@ -1,8 +1,8 @@
-import { useTranslations } from "next-intl"
+import { getDictionary } from "../dictionaries"
 
-const MyComponent = () => {
-    const t = useTranslations('ServerComponent')
-    return <div> {t('title')}</div>
+const MyComponent = ({ dict }: { dict: object}) => {
+    
+    return <div> {dict.ServerComponent.title}</div>
 
 }
 export { MyComponent }

@@ -1,13 +1,14 @@
-import { useTranslations } from "next-intl";
+import { Locale } from "@/i18n.types";
+import { getDictionary } from "./dictionaries";
 import styles from "./page.module.css";
 
 
-export default function Home() {
-  const t = useTranslations('HomePage')
+export default async function Home({ params: { locale } }: {params: Locale}) {
+  const dict = await getDictionary(locale)
   return (
     <main className={styles.main}>
       <div className={styles.description}>
-        <p> {t('title')}</p>
+        <p> {dict.HomePage.title}</p>
       </div>
     </main>
   );

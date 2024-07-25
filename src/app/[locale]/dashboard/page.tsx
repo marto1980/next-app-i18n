@@ -1,11 +1,14 @@
+import { Locale } from '@/i18n.types'
+import { getDictionary } from '../dictionaries'
 import { MyClientComponent } from './MyClientComponent'
 import { MyComponent } from './MyComponent'
 
-export default function Page() {
+export default async function Page({ params: { locale } }: {params: Locale}) {
+	const dict = await getDictionary(locale)
 	return (
 		<>
-			<MyComponent />
-			<MyClientComponent />
+			<MyComponent dict={dict} />
+			<MyClientComponent dict={dict}/>
 		</>
 	)
 }

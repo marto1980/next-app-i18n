@@ -1,11 +1,9 @@
 'use client'
 
-import { useTranslations } from "next-intl"
 
 
-const MyClientComponent = () => {
-    const t = useTranslations('ClientComponent')
-    return <div> {t('title')}</div>
+const MyClientComponent = ({dict}:{dict:object}) => {
+    return <div> {dict.ClientComponent.title}</div>
 }
 
 export { MyClientComponent }
