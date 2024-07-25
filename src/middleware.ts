@@ -1,8 +1,6 @@
-// middleware.ts
-import { NextResponse, NextRequest } from 'next/server';
 import createMiddleware from 'next-intl/middleware';
-import { Locale } from './i18n.types';
-const locales = ['en', 'de'];
+import { NextRequest, NextResponse } from 'next/server';
+import { fetchLocale, locales } from './fetchLocale';
 
 // Default locale if backend doesn't provide one
 const defaultLocale = 'en';
@@ -11,51 +9,44 @@ const defaultLocale = 'en';
 const handleI18nRouting = createMiddleware({
   locales,
   defaultLocale,
-});
+})
 
-const getLocale = async (): Promise<Locale> => {
-    const response = await fetch('http://localhost:3001/locale', {cache: 'no-store'});
-    if (!response.ok) {
-        throw new Error('Network response was not ok');
-    }
-    const data: Locale = await response.json();
-    return data;
-};
 
-export default async function middleware(request: NextRequest) {
-  const { pathname } = request.nextUrl;
+export async function middleware(request: NextRequest) {
+  // Check if there is any supported locale in the pathname
   const url = request.nextUrl.clone();
+  const { pathname } = url
+
+  const pathnameHasLocale = locales.some(
+    (locale) => pathname.startsWith(`/${locale}/`) || pathname === `/${locale}`
+  )
 
   // Skip static files and API routes
   if (pathname.startsWith('/_next/') || pathname.startsWith('/api/')) {
     return NextResponse.next();
   }
 
-  // Fetch user locale from backend or service
-  const {locale: userLocale } = await getLocale();
+  if (pathnameHasLocale) return handleI18nRouting(request);
 
-  // Check if the pathname already includes a locale prefix
-  const hasLocalePrefix = locales.some(locale => pathname.startsWith(`/${locale}`));
-
+  const { locale } = await fetchLocale()
   // Redirect root path to user locale
   if (pathname === '/') {
-    url.pathname = `/${userLocale}`;
+    url.pathname = `/${locale}`;
     return NextResponse.redirect(url);
   }
 
-  // Redirect paths without a locale prefix to include the user locale
-  if (!hasLocalePrefix) {
-    url.pathname = `/${userLocale}${pathname}`;
-    return NextResponse.redirect(url);
-  }
-
-  // If the locale is already included or other cases, process normally
-  return handleI18nRouting(request);
+  // Redirect if there is no locale
+  request.nextUrl.pathname = `/${locale}${pathname}`
+  // e.g. incoming request is /products
+  // The new URL is now /en-US/products
+  return NextResponse.redirect(request.nextUrl)
 }
 
 export const config = {
   matcher: [
-    // Match all routes except for static files and API routes
-    '/((?!api|_next|.*\\..*).*)',
+    // Skip all internal paths (_next)
+    '/((?!_next).*)',
+    // Optional: only run on root (/) URL
+    // '/'
   ],
-};
+}
